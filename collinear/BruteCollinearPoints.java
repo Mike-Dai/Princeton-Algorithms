@@ -1,8 +1,8 @@
-import java.utils.Arrays;
+import java.util.Arrays;
 
 public class BruteCollinearPoints {
-	private final Point[] points;
-	private final LineSegment segments;
+	private Point[] mypoints;
+	private LineSegment[] segarray;
 	private int segnumber;
 
 	public BruteCollinearPoints(Point[] points) {
@@ -14,8 +14,40 @@ public class BruteCollinearPoints {
 				throw new IllegalArgumentException();
 			}
 		}
+		this.segarray = new LineSegment[points.length];
 		this.segnumber = 0;
-		this.points = points;
+		this.mypoints = points;
+		Arrays.sort(mypoints);
+		for (int i = 0; i < mypoints.length - 1; i++) {
+			if (mypoints[i].compareTo(mypoints[i+1]) == 0) {
+				throw new IllegalArgumentException();
+			}
+		}
+		for (int i = 0; i < mypoints.length; i++) {
+			for (int j = i + 1; j < mypoints.length; j++) {
+				for (int k = j + 1; k < mypoints.length; k++) {
+					for (int l = k + 1; l < mypoints.length; l++) {
+						Point p = mypoints[i], q = mypoints[j], r = mypoints[k], s = mypoints[l];
+						if (p.slopeTo(q) == q.slopeTo(r) && q.slopeTo(r) == r.slopeTo(s)) {
+							/*
+							int low = i, high = l;
+							Arrays.sort(points, low, high, slopeOrder);
+							p = points[i];
+							s = points[l];
+							*/
+							segarray[segnumber] = new LineSegment(p, s);
+							segnumber++;
+						}
+					}
+				}
+			}
+		}
+		LineSegment[] copy = new LineSegment[segnumber];
+		for (int i = 0; i < segnumber; i++) {
+			copy[i] = segarray[i];
+		}
+		segarray = copy;
+		/*
 		Point origin = new Point(0, 0);
 		Arrays.sort(points, origin.slopeOrder());
 		for (int i = 0; i < points.length; i++) {
@@ -43,14 +75,16 @@ public class BruteCollinearPoints {
 						end = segpoint[p];
 					}
 				}
-				segments[signumber++] = new LineSegment(points[segpoint[0]], points[segpoint[end]]);
+				segments[segnumber++] = new LineSegment(points[segpoint[0]], points[segpoint[end]]);
 			}
 		}
+		*/
 	}
+	
 	public int numberOfSegments() {
 		return segnumber;
 	}
 	public LineSegment[] segments() {
-		return segments;
+		return segarray;
 	}
 }

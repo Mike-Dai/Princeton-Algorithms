@@ -52,16 +52,15 @@ public class Point implements Comparable<Point> {
 			result = Double.NEGATIVE_INFINITY;
 		}
 		else {
-			result = (double)(that.y - this.y) / (this.x - this.y);
+			result = (double)(that.y - this.y) / (that.x - this.x);
 		}
 		return result;
 	}
 
 	private class SlopeOrder implements Comparator<Point> {
-
 		public int compare(Point q, Point r) {
-			if (p.slopeTo(q) > p.slopeTo(r)) return 1;
-			else if (p.slopeTo(q) < p.slopeTo(r)) return -1;
+			if (slopeTo(q) > slopeTo(r)) return 1;
+			else if (slopeTo(q) < slopeTo(r)) return -1;
 			else return 0;
 		}
 	}
