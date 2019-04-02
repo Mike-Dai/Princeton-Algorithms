@@ -1,4 +1,4 @@
-import java.util.*;
+import java.util.ArrayList;
 
 public class Board {
 	private final int[][] blocks;
@@ -84,18 +84,14 @@ public class Board {
 	}
 
 	public boolean equals(Object y) {
-		for (int i = 0; i < dimension(); i++) {
-			for (int j = 0; j < dimension(); j++) {
-				if (blocks[i][j] != y[i][j]) {
-					return false;
-				}
-			}
+		if (y.getClass() != this.getClass()) {
+			return false;
 		}
-		return true;
+		return toString().equals(y.toString());
 	}
 
 	public Iterable<Board> neighbors() {
-		Queue<Board> queue = new Queue<Board>();
+		ArrayList<Board> queue = new ArrayList<Board>();
 		int n = dimension();
 		for (int i = 0; i < n; i++) {
 			for (int j = 0; j < n; j++) {
@@ -124,6 +120,7 @@ public class Board {
 				}
 			}
 		}
+		return queue;
 	}
 
 	public String toString() {
