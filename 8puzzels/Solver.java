@@ -5,7 +5,9 @@ import edu.princeton.cs.algs4.MinPQ;
 public class Solver {
 	private Board board;
 	private int moves;
+	private boolean isSolvable;
 	private ArrayList<Board> solution;
+	
 
 	private class SearchNode implements Comparable<SearchNode>{
 		private Board sboard;
@@ -37,14 +39,22 @@ public class Solver {
 	public Solver(Board initial) {
 		board = initial;
 		moves = 0;
+		isSolvable = true;
 		solution = new ArrayList<Board>();
-		int valid = 1;
+		//int valid = 1;
 		MinPQ<SearchNode> minpq = new MinPQ<SearchNode>();
 		SearchNode node = new SearchNode(board);
+		node.prev = null;
 		SearchNode min = node;
 		solution.add(node.sboard);
 		while (!min.sboard.isGoal()) {
 			for (Board neighbor : min.sboard.neighbors()) {
+				if (!neighbor.equals(min.prev)) {
+					SearchNode snode = new SearchNode(neighbor);
+					snode.prev = min.prev;
+					minpq.insert(snode);
+				}
+				/*
 				for (Board pred : this.solution()) {
 					if (pred.equals(neighbor)) {
 						valid = 0;
@@ -58,12 +68,15 @@ public class Solver {
 				else {
 					valid = 1;
 				}
+				*/
 			}
-			min = minpq.delMin();
-			moves++;
-			solution.add(min.sboard);
-			while (!minpq.isEmpty()) {
-				SearchNode del = minpq.delMin();
+			if (!minpq.isEmpty()) {
+				min = minpq.delMin();
+				moves++;
+				solution.add(min.sboard);
+				while (!minpq.isEmpty()) {
+					SearchNode del = minpq.delMin();
+				}
 			}
 		}
 	}
@@ -83,15 +96,35 @@ public class Solver {
 
 	public boolean isSolvable() {
 		/*
-		int n = board.dimension();
-		int inversion;
-		for (int i = 0; i < n; i++) {
-			for (int j = 0; j < n; j++) {
-				int number = 
-				int order = two2one(i, j) + 1;
-				while (order <= n * n) {
-
-					order++;
+		MinPQ<SearchNode> originpq = new MinPQ<SearchNode>();
+		MinPQ<SearchNode> twinpq = new MinPQ<SearchNode>();
+		Board twinboard = board.twin();
+		SearchNode sorigin = new SearchNode(board);
+		SearchNode stwin = new SearchNode(twinboard);
+		SearchNode minOrigin = sorigin;
+		SearchNode mintwin = stwin;
+		while (true) {
+			for (Board neighbor : minOrigin.sboard.neighbors()) {
+				for (Board pred : this.solution) {
+					if (pred.equals(neighbor)) {
+						valid = 0;
+						break;
+					}
+				}
+				if (valid == 1) {
+					SearchNode snode = new SearchNode(neighbor);
+					originpq.insert(snode);
+				}
+				else {
+					valid = 1;
+				}
+			}
+			if (!originpq.isEmpty()) {
+				minOrigin = originpq.delMin();
+				moves++;
+				solution.add(minOrigin.sboard);
+				while (!originpq.isEmpty()) {
+					SearchNode del = originpq.delMin();
 				}
 			}
 		}
@@ -100,11 +133,21 @@ public class Solver {
 	}
 
 	public int moves() {
-		return this.moves;
+		if (isSolvable()) {
+			return this.moves;
+		}
+		else {
+			return -1;
+		}
 	}
 
 	public Iterable<Board> solution() {
-		return this.solution;
+		if (isSolvable()) {
+			return this.solution;
+		}
+		else {
+			return null;
+		}
 	}
 
 	public static void main(String[] args) {
