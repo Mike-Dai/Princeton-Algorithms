@@ -37,17 +37,33 @@ public class Solver {
 	}
 
 	public Solver(Board initial) {
+		if (initial == null) {
+			throw new IllegalArgumentException();
+		}
 		board = initial;
 		moves = 0;
 		isSolvable = true;
 		solution = new ArrayList<Board>();
 		//int valid = 1;
 		MinPQ<SearchNode> minpq = new MinPQ<SearchNode>();
+		MinPQ<SearchNode> twinpq = new MinPQ<SearchNode>();
 		SearchNode node = new SearchNode(board);
+		SearchNode twinnode = new SearchNode(board.twin());
 		node.prev = null;
+		twinnode.prev = null;
 		SearchNode min = node;
+		SearchNode twinmin = twinnode;
 		solution.add(node.sboard);
-		while (!min.sboard.isGoal()) {
+		while (true) {
+			if (min.sboard.isGoal()) {
+				isSolvable = true;
+				break;
+			}
+			if (twinmin.sboard.isGoal()) {
+				isSolvable = false;
+				break;
+			}
+
 			for (Board neighbor : min.sboard.neighbors()) {
 				if (!neighbor.equals(min.prev)) {
 					SearchNode snode = new SearchNode(neighbor);
@@ -78,6 +94,22 @@ public class Solver {
 					SearchNode del = minpq.delMin();
 				}
 			}
+
+			for (Board twinneighbor : twinmin.sboard.neighbors()) {
+				if (!twinneighbor.equals(twinmin.prev)) {
+					SearchNode twinsnode = new SearchNode(twinneighbor);
+					twinsnode.prev = twinmin.prev;
+					twinpq.insert(twinsnode);
+				}
+			}
+			if (!twinpq.isEmpty()) {
+				twinmin = twinpq.delMin();
+				//moves++;
+				//solution.add(min.sboard);
+				while (!twinpq.isEmpty()) {
+					SearchNode twindel = twinpq.delMin();
+				}
+			}
 		}
 	}
 
@@ -95,41 +127,7 @@ public class Solver {
 */
 
 	public boolean isSolvable() {
-		/*
-		MinPQ<SearchNode> originpq = new MinPQ<SearchNode>();
-		MinPQ<SearchNode> twinpq = new MinPQ<SearchNode>();
-		Board twinboard = board.twin();
-		SearchNode sorigin = new SearchNode(board);
-		SearchNode stwin = new SearchNode(twinboard);
-		SearchNode minOrigin = sorigin;
-		SearchNode mintwin = stwin;
-		while (true) {
-			for (Board neighbor : minOrigin.sboard.neighbors()) {
-				for (Board pred : this.solution) {
-					if (pred.equals(neighbor)) {
-						valid = 0;
-						break;
-					}
-				}
-				if (valid == 1) {
-					SearchNode snode = new SearchNode(neighbor);
-					originpq.insert(snode);
-				}
-				else {
-					valid = 1;
-				}
-			}
-			if (!originpq.isEmpty()) {
-				minOrigin = originpq.delMin();
-				moves++;
-				solution.add(minOrigin.sboard);
-				while (!originpq.isEmpty()) {
-					SearchNode del = originpq.delMin();
-				}
-			}
-		}
-		*/
-		return true;
+		return isSolvable;
 	}
 
 	public int moves() {
