@@ -8,20 +8,20 @@ public class Solver {
 	private ArrayList<Board> solution;
 
 	private class SearchNode implements Comparable<SearchNode>{
-		private Board board;
+		private Board sboard;
 		private Board prev;
-		private int hamming;
+		private int smoves;
 		private int manhattan;
 
 		public SearchNode(Board board) {
-			this.board = board;
-			hamming = board.hamming();
+			this.sboard = board;
+			smoves = moves;
 			manhattan = board.manhattan();
 		}
 
 		public int compareTo(SearchNode that) {
-			int priority1 = this.hamming + this.manhattan;
-			int priority2 = that.hamming + that.manhattan;
+			int priority1 = this.smoves + this.manhattan;
+			int priority2 = that.smoves + that.manhattan;
 			if (priority1 < priority2) {
 				return -1;
 			}
@@ -38,17 +38,33 @@ public class Solver {
 		board = initial;
 		moves = 0;
 		solution = new ArrayList<Board>();
+		int valid = 1;
 		MinPQ<SearchNode> minpq = new MinPQ<SearchNode>();
 		SearchNode node = new SearchNode(board);
 		SearchNode min = node;
-		while (!min.board.isGoal()) {
-			for (Board neighbor : min.board.neighbors()) {
-				SearchNode snode = new SearchNode(neighbor);
-				minpq.insert(snode);
+		solution.add(node.sboard);
+		while (!min.sboard.isGoal()) {
+			for (Board neighbor : min.sboard.neighbors()) {
+				for (Board pred : this.solution()) {
+					if (pred.equals(neighbor)) {
+						valid = 0;
+						break;
+					}
+				}
+				if (valid == 1) {
+					SearchNode snode = new SearchNode(neighbor);
+					minpq.insert(snode);
+				}
+				else {
+					valid = 1;
+				}
 			}
 			min = minpq.delMin();
 			moves++;
-			solution.add(min.board);
+			solution.add(min.sboard);
+			while (!minpq.isEmpty()) {
+				SearchNode del = minpq.delMin();
+			}
 		}
 	}
 

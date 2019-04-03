@@ -1,4 +1,5 @@
 import edu.princeton.cs.algs4.In;
+import edu.princeton.cs.algs4.StdOut;
 
 public class Client {
 	public static void main(String[] args) {
@@ -11,10 +12,19 @@ public class Client {
 	        for (int j = 0; j < n; j++)
 	            blocks[i][j] = in.readInt();
 	    Board initial = new Board(blocks);
-	    /*
-	    for (Board board : initial.neighbors()) {
-	    	System.out.print(board.toString());
+	    
+	    Solver solver = new Solver(initial);
+
+	    // print solution to standard output
+	    if (!solver.isSolvable())
+	        StdOut.println("No solution possible");
+	    else {
+	        StdOut.println("Minimum number of moves = " + solver.moves());
+	        for (Board board : solver.solution()) {
+	        	
+	            StdOut.println(board);
+	        }
 	    }
-	    */
+	    
 	}
 }
