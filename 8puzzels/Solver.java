@@ -1,154 +1,128 @@
-import java.util.ArrayList;
-import java.util.Comparator;
 import edu.princeton.cs.algs4.MinPQ;
+import java.util.Comparator;
+import java.util.Stack;
+import java.lang.NullPointerException;
 
 public class Solver {
-	private Board board;
-	private int moves;
-	private boolean isSolvable;
-	private ArrayList<Board> solution;
-	
-
-	private class SearchNode implements Comparable<SearchNode>{
-		private Board sboard;
-		private Board prev;
-		private int smoves;
-		private int manhattan;
-
-		public SearchNode(Board board) {
-			this.sboard = board;
-			smoves = moves;
-			manhattan = board.manhattan();
-		}
-
-		public int compareTo(SearchNode that) {
-			int priority1 = this.smoves + this.manhattan;
-			int priority2 = that.smoves + that.manhattan;
-			if (priority1 < priority2) {
-				return -1;
-			}
-			else if (priority1 > priority2) {
-				return 1;
-			}
-			else {
-				return 0;
-			}
-		}
-	}
-
-	public Solver(Board initial) {
-		if (initial == null) {
-			throw new IllegalArgumentException();
-		}
-		board = initial;
-		moves = 0;
-		isSolvable = true;
-		solution = new ArrayList<Board>();
-		//int valid = 1;
-		MinPQ<SearchNode> minpq = new MinPQ<SearchNode>();
-		MinPQ<SearchNode> twinpq = new MinPQ<SearchNode>();
-		SearchNode node = new SearchNode(board);
-		SearchNode twinnode = new SearchNode(board.twin());
-		node.prev = null;
-		twinnode.prev = null;
-		SearchNode min = node;
-		SearchNode twinmin = twinnode;
-		solution.add(node.sboard);
-		while (true) {
-			if (min.sboard.isGoal()) {
-				isSolvable = true;
-				break;
-			}
-			if (twinmin.sboard.isGoal()) {
-				isSolvable = false;
-				break;
-			}
-
-			for (Board neighbor : min.sboard.neighbors()) {
-				if (!neighbor.equals(min.prev)) {
-					SearchNode snode = new SearchNode(neighbor);
-					snode.prev = min.prev;
-					minpq.insert(snode);
-				}
-				/*
-				for (Board pred : this.solution()) {
-					if (pred.equals(neighbor)) {
-						valid = 0;
-						break;
-					}
-				}
-				if (valid == 1) {
-					SearchNode snode = new SearchNode(neighbor);
-					minpq.insert(snode);
-				}
-				else {
-					valid = 1;
-				}
-				*/
-			}
-			if (!minpq.isEmpty()) {
-				min = minpq.delMin();
-				moves++;
-				solution.add(min.sboard);
-				while (!minpq.isEmpty()) {
-					SearchNode del = minpq.delMin();
-				}
-			}
-
-			for (Board twinneighbor : twinmin.sboard.neighbors()) {
-				if (!twinneighbor.equals(twinmin.prev)) {
-					SearchNode twinsnode = new SearchNode(twinneighbor);
-					twinsnode.prev = twinmin.prev;
-					twinpq.insert(twinsnode);
-				}
-			}
-			if (!twinpq.isEmpty()) {
-				twinmin = twinpq.delMin();
-				//moves++;
-				//solution.add(min.sboard);
-				while (!twinpq.isEmpty()) {
-					SearchNode twindel = twinpq.delMin();
-				}
-			}
-		}
-	}
-
-	private int two2one(int row, int col) {
-		return row * board.dimension() + col + 1;
-	}
-/*
-	private int[] one2two(int num) {
-		num--;
-		int[] axis = new int[2];
-		axis[0] = num / dimension();
-		axis[1] = num % dimension();
-		return axis;
-	}
-*/
-
-	public boolean isSolvable() {
-		return isSolvable;
-	}
-
-	public int moves() {
-		if (isSolvable()) {
-			return this.moves;
-		}
-		else {
-			return -1;
-		}
-	}
-
-	public Iterable<Board> solution() {
-		if (isSolvable()) {
-			return this.solution;
-		}
-		else {
-			return null;
-		}
-	}
-
-	public static void main(String[] args) {
-		return;
-	}
+    private MinPQ<Node> heap;
+    private MinPQ<Node> heapTwin;
+    private Stack<Board> solutionStack = new Stack<Board>();
+    private boolean mSolvable = true;
+    
+    private class Node {
+        Board board;
+        int steps;
+        Node parent;
+        
+        Node (Board b, int s, Node n) {
+            board = b;
+            steps = s;
+            parent = n;
+        }
+    }
+    
+    private class Priority implements Comparator<Node> {
+        public int compare(Node a, Node b) {
+            int m1 = a.board.manhattan();
+            int m2 = b.board.manhattan();
+            int d1 = m1 + a.steps;
+            int d2 = m2 + b.steps;
+            if (d1 < d2) {
+                return -1;
+            } else if (d1 == d2) {
+                if (m1 < m2) return -1;
+                if (m1 > m2) return 1;
+                return 0;
+            } else {
+                return 1;
+            }
+        }
+    }
+    
+    private void makeSolutions(Node node) {
+        while (node != null) {
+            solutionStack.push(node.board);
+            node = node.parent;
+        }
+    }
+    
+    public Solver(Board initial) {
+        if (initial == null) throw new NullPointerException();
+        
+        Node node = new Node(initial, 0, null);
+        Node nodeTwin = new Node(initial.twin(), 0, null);
+        heap = new MinPQ<Node>(new Priority());
+        heapTwin = new MinPQ<Node>(new Priority());
+        heap.insert(node);
+        heapTwin.insert(nodeTwin);
+        while (!heap.isEmpty()) {
+            
+            nodeTwin = heapTwin.delMin();
+            if (nodeTwin.board.isGoal()) { 
+                mSolvable = false;
+                return;
+            }
+            
+            node = heap.delMin();
+            if (node.board.isGoal()) {
+                makeSolutions(node);
+                return;
+            } else {
+                Node child;
+                Node childTwin;
+                boolean guard_child = true;  // used for optimization
+                boolean guard_childTwin = true;
+                for (Board b : node.board.neighbors()) {
+                    if (guard_child) {
+                        if (node.parent != null && b.equals(node.parent.board)) {
+                            guard_child = false;
+                            continue;
+                        } else {
+                            child = new Node(b, node.steps + 1, node);
+                            heap.insert(child);
+                        }
+                    } else {
+                        child = new Node(b, node.steps + 1, node);
+                        heap.insert(child);
+                    }
+                }
+                for (Board b : nodeTwin.board.neighbors()) {
+                    if (guard_childTwin) {
+                        if (nodeTwin.parent != null && b.equals(nodeTwin.parent.board)) {
+                            guard_childTwin = false;
+                            continue;
+                        } else {
+                            childTwin = new Node(b, nodeTwin.steps + 1, nodeTwin);
+                            heapTwin.insert(childTwin);
+                        }
+                    } else {
+                        childTwin = new Node(b, nodeTwin.steps + 1, nodeTwin);
+                        heapTwin.insert(childTwin);
+                    }
+                }
+            }
+        }
+    }
+    
+    // is the initial board solvable?
+    public boolean isSolvable() {
+        return mSolvable;
+    }
+    
+    // min number of moves to solve initial board; -1 if unsolvable
+    public int moves() {
+        if (isSolvable())
+            return solutionStack.size() - 1;
+        else 
+            return -1;
+    }
+    
+    // sequence of boards in a shortest solution; null if unsolvable
+    public Iterable<Board> solution() {
+        if (isSolvable())
+            return solutionStack;
+        else 
+            return null;
+    }
+        
 }
