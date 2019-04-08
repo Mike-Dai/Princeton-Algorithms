@@ -1,6 +1,7 @@
 import edu.princeton.cs.algs4.MinPQ;
 import java.util.Comparator;
 import java.util.Stack;
+import java.util.ArrayList;
 import java.lang.NullPointerException;
 
 public class Solver {
@@ -13,18 +14,20 @@ public class Solver {
         Board board;
         int steps;
         Node parent;
+        int manhattan;
         
         Node (Board b, int s, Node n) {
             board = b;
             steps = s;
             parent = n;
+            manhattan = b.manhattan();
         }
     }
     
     private class Priority implements Comparator<Node> {
         public int compare(Node a, Node b) {
-            int m1 = a.board.manhattan();
-            int m2 = b.board.manhattan();
+            int m1 = a.manhattan;
+            int m2 = b.manhattan;
             int d1 = m1 + a.steps;
             int d2 = m2 + b.steps;
             if (d1 < d2) {
@@ -119,10 +122,16 @@ public class Solver {
     
     // sequence of boards in a shortest solution; null if unsolvable
     public Iterable<Board> solution() {
-        if (isSolvable())
-            return solutionStack;
-        else 
+        if (isSolvable()) {
+        	ArrayList solutionArray = new ArrayList<Board>();
+        	while (!solutionStack.empty()) {
+        		solutionArray.add(solutionStack.pop());
+        	}
+            return solutionArray;
+        }
+        else {
             return null;
+        }
     }
         
 }

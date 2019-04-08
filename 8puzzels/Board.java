@@ -2,7 +2,7 @@ import java.util.ArrayList;
 
 public class Board {
 	private final int[][] blocks;
-	private int priority;
+	//private int priority;
 
 	public Board(int[][] blocks) {
 		this.blocks = blocks;
@@ -16,7 +16,7 @@ public class Board {
 				this.blocks[i][j] = that.blocks[i][j];
 			}
 		}
-		priority = this.hamming() + this.manhattan();
+		//priority = this.hamming() + this.manhattan();
 	}
 
 	public int dimension() {
