@@ -129,9 +129,9 @@ public class KdTree {
 						child = new Node(p);
 						parent.setlb(child);
 						xmin = parent.xmin();
-						ymin = parent.y();
+						ymin = parent.ymin();
 						xmax = parent.xmax();
-						ymax = parent.ymax();
+						ymax = parent.y();
 						child.setRect(xmin, ymin, xmax, ymax);
 						return;
 					}
@@ -144,9 +144,9 @@ public class KdTree {
 						child = new Node(p);
 						parent.setrt(child);
 						xmin = parent.xmin();
-						ymin = parent.ymin();
+						ymin = parent.y();
 						xmax = parent.xmax();
-						ymax = parent.y();
+						ymax = parent.ymax();
 						child.setRect(xmin, ymin, xmax, ymax);
 						return;
 					}
@@ -160,11 +160,15 @@ public class KdTree {
 		if (p == null) {
 			throw new IllegalArgumentException();
 		}
+		if (root == null) {
+			return false;
+		}
 		Node node = root;
 		int level = 1;
 		while (node.lb != null || node.rt != null) {
 			if (level % 2 == 1) {
-				if (p.x() < node.x()) {
+				double value = Double.compare(p.x(), node.x());
+				if (value < 0) {
 					if (node.lb != null) {
 						node = node.lb;
 					}
@@ -172,7 +176,7 @@ public class KdTree {
 						break;
 					}
 				}
-				else if (p.x() == node.x() && p.y() == node.y()) {
+				else if (value == 0 && Double.compare(p.y(), node.y()) == 0) {
 					return true;
 				}
 				else {
@@ -185,7 +189,8 @@ public class KdTree {
 				}
 			}
 			else if (level % 2 == 0) {
-				if (p.y() < node.y()) {
+				double value = Double.compare(p.y(), node.y());
+				if (value < 0) {
 					if (node.lb != null) {
 						node = node.lb;
 					}
@@ -193,7 +198,7 @@ public class KdTree {
 						break;
 					}
 				}
-				else if (p.x() == node.x() && p.y() == node.y()) {
+				else if (value == 0 && Double.compare(p.y(), node.y()) == 0) {
 					return true;
 				}
 				else {
