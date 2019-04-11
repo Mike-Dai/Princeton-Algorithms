@@ -19,7 +19,6 @@ public class KdTree {
 			this.p = p;
 			lb = null;
 			rt = null;
-
 		}
 
 		public double x() {
@@ -36,6 +35,26 @@ public class KdTree {
 
 		public void setrt(Node node) {
 			rt = node;
+		}
+
+		public double xmin() {
+			return rect.xmin();
+		}
+
+		public double ymin() {
+			return rect.ymin();
+		}
+
+		public double xmax() {
+			return rect.xmax();
+		}
+
+		public double ymax() {
+			return rect.ymax();
+		}
+
+		public void setRect(double xmin, double ymin, double xmax, double ymax) {
+			rect = new RectHV(xmin, ymin, xmax, ymax);
 		}
 	}
 
@@ -61,11 +80,13 @@ public class KdTree {
 		pset.add(p);
 		if (isEmpty()) {
 			root = node;
+			node.setRect(0, 0, 1, 1);
 		}
 		size++;
 		Node parent = root;
 		Node child;
 		int level = 1;
+		double xmin, ymin, xmax, ymax;
 		while (true) {
 			if (level % 2 == 1) {
 				if (p.x() < parent.x()) {
@@ -75,6 +96,11 @@ public class KdTree {
 					else {
 						child = new Node(p);
 						parent.setlb(child);
+						xmin = parent.xmin();
+						ymin = parent.ymin();
+						xmax = parent.x();
+						ymax = parent.ymax();
+						child.setRect(xmin, ymin, xmax, ymax);
 						return;
 					}
 				}
@@ -85,6 +111,11 @@ public class KdTree {
 					else {
 						child = new Node(p);
 						parent.setrt(child);
+						xmin = parent.x();
+						ymin = parent.ymin();
+						xmax = parent.xmax();
+						ymax = parent.ymax();
+						child.setRect(xmin, ymin, xmax, ymax);
 						return;
 					}
 				}
@@ -97,6 +128,11 @@ public class KdTree {
 					else {
 						child = new Node(p);
 						parent.setlb(child);
+						xmin = parent.xmin();
+						ymin = parent.y();
+						xmax = parent.xmax();
+						ymax = parent.ymax();
+						child.setRect(xmin, ymin, xmax, ymax);
 						return;
 					}
 				}
@@ -107,6 +143,11 @@ public class KdTree {
 					else {
 						child = new Node(p);
 						parent.setrt(child);
+						xmin = parent.xmin();
+						ymin = parent.ymin();
+						xmax = parent.xmax();
+						ymax = parent.y();
+						child.setRect(xmin, ymin, xmax, ymax);
 						return;
 					}
 				}

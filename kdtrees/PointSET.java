@@ -4,20 +4,20 @@ import edu.princeton.cs.algs4.SET;
 import java.util.ArrayList;
 
 public class PointSET {
-	private int size;
+	//private int size;
 	private SET<Point2D> pset;
 
 	public PointSET() {
-		size = 0;
+		//size = 0;
 		pset = new SET<Point2D>();
 	}
 
 	public boolean isEmpty() {
-		return size == 0;
+		return pset.size() == 0;
 	}
 
 	public int size() {
-		return size;
+		return pset.size();
 	}
 
 	public void insert(Point2D p) {
@@ -25,7 +25,7 @@ public class PointSET {
 			throw new IllegalArgumentException();
 		}
 		pset.add(p);
-		size++;
+		//size++;
 	}
 
 	public boolean contains(Point2D p) {
