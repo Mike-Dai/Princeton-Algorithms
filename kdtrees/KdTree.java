@@ -2,7 +2,7 @@ import edu.princeton.cs.algs4.Point2D;
 import edu.princeton.cs.algs4.RectHV;
 import edu.princeton.cs.algs4.SET;
 import java.util.ArrayList;
-import java.util.Iterator;
+//import java.util.Iterator;
 
 public class KdTree {
 	private int size;
@@ -14,6 +14,7 @@ public class KdTree {
 		private RectHV rect;
 		private Node lb;
 		private Node rt;
+		private boolean isVertical;
 
 		public Node(Point2D p) {
 			this.p = p;
@@ -55,6 +56,27 @@ public class KdTree {
 
 		public void setRect(double xmin, double ymin, double xmax, double ymax) {
 			rect = new RectHV(xmin, ymin, xmax, ymax);
+		}
+
+		public RectHV getRect() {
+			return rect;
+		}
+
+		public Point2D getP() {
+			return p;
+		}
+
+		public boolean isVertical() {
+			return isVertical;
+		}
+
+		public void setDir(int direction) {
+			if (direction == 1) {
+				isVertical = true;
+			}
+			else {
+				isVertical = false;
+			}
 		}
 	}
 
@@ -101,6 +123,7 @@ public class KdTree {
 						xmax = parent.x();
 						ymax = parent.ymax();
 						child.setRect(xmin, ymin, xmax, ymax);
+						child.setDir(0);
 						return;
 					}
 				}
@@ -116,6 +139,7 @@ public class KdTree {
 						xmax = parent.xmax();
 						ymax = parent.ymax();
 						child.setRect(xmin, ymin, xmax, ymax);
+						child.setDir(0);
 						return;
 					}
 				}
@@ -133,6 +157,7 @@ public class KdTree {
 						xmax = parent.xmax();
 						ymax = parent.y();
 						child.setRect(xmin, ymin, xmax, ymax);
+						child.setDir(1);
 						return;
 					}
 				}
@@ -148,6 +173,7 @@ public class KdTree {
 						xmax = parent.xmax();
 						ymax = parent.ymax();
 						child.setRect(xmin, ymin, xmax, ymax);
+						child.setDir(1);
 						return;
 					}
 				}
@@ -221,16 +247,39 @@ public class KdTree {
 		}
 	}
 
+	private xxx search(Node node, RectHV rect) {
+		if (!node.getRect().intersects(rect)) {
+			return null;
+		}
+		else {
+			if (node.lb != null) {
+				
+			}
+		}
+	}
+
 	public Iterable<Point2D> range(RectHV rect) {
 		if (rect == null) {
 			throw new IllegalArgumentException();
 		}
+		if (pset.isEmpty()) {
+			return null;
+		}
 		ArrayList array = new ArrayList<Point2D>();
+		Node node = root;
+		int level = 1;
+		while (node.lb != null || node.rt != null) {
+			if (node.getRect().intersects(rect)) {
+
+			}
+		}
+		/*
 		for (Point2D p : pset) {
 			if (rect.contains(p)) {
 				array.add(p);
 			}
 		}
+		*/
 		return array;
 	}
 
