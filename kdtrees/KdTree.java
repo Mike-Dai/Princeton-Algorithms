@@ -2,10 +2,11 @@ import edu.princeton.cs.algs4.Point2D;
 import edu.princeton.cs.algs4.RectHV;
 import edu.princeton.cs.algs4.SET;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class KdTree {
 	private int size;
-	private SET pset;
+	private SET<Point2D> pset;
 	private Node root;
 
 	private static class Node {
@@ -40,7 +41,7 @@ public class KdTree {
 
 	public KdTree() {
 		size = 0;
-		pset = new SET<Node>();
+		pset = new SET<Point2D>();
 		root = null;
 	}
 
@@ -169,7 +170,7 @@ public class KdTree {
 	}
 
 	public void draw() {
-		for (Point2D p : pset.iterator()) {
+		for (Point2D p : pset) {
 			p.draw();
 		}
 	}
@@ -179,7 +180,7 @@ public class KdTree {
 			throw new IllegalArgumentException();
 		}
 		ArrayList array = new ArrayList<Point2D>();
-		for (Point2D p : pset.iterator()) {
+		for (Point2D p : pset) {
 			if (rect.contains(p)) {
 				array.add(p);
 			}
@@ -191,16 +192,15 @@ public class KdTree {
 		if (p == null) {
 			throw new IllegalArgumentException();
 		}
-		Point2D big = pset.ceiling(p);
-		Point2D small = pset.floor(p);
-		double disBig = p.distanceTo(big);
-		double disSmall = p.distanceTo(small);
-		if (disBig < disSmall) {
-			return big;
+		Point2D minp = null;
+		double min = 10;
+		for (Point2D point : pset) {
+			if (p.distanceSquaredTo(point) < min) {
+				min = p.distanceSquaredTo(point);
+				minp = point;
+			}
 		}
-		else {
-			return small;
-		}
+		return minp;
 	}
 
 	public static void main(String[] args) {
