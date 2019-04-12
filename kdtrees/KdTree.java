@@ -2,6 +2,7 @@ import edu.princeton.cs.algs4.Point2D;
 import edu.princeton.cs.algs4.RectHV;
 import edu.princeton.cs.algs4.SET;
 import java.util.ArrayList;
+import edu.princeton.cs.algs4.Queue;
 //import java.util.Iterator;
 
 public class KdTree {
@@ -247,21 +248,21 @@ public class KdTree {
 		}
 	}
 
-	private void search(Node node, ArrayList<Point2D> array, RectHV rect) {
+	private void search(Node node, Queue<Point2D> array, RectHV rect) {
 		if (!node.getRect().intersects(rect)) {
 			return;
 		}
 		if (node.lb != null) {
 			Node lb = node.lb;
 			if (rect.contains(lb.getP())) {
-				array.add(lb.getP());
+				array.enqueue(lb.getP());
 			}
 			search(lb, array, rect);
 		}
 		if (node.rt != null) {
 			Node rt = node.rt;
 			if (rect.contains(rt.getP())) {
-				array.add(rt.getP());
+				array.enqueue(rt.getP());
 			}
 			search(rt, array, rect);
 		}
@@ -275,7 +276,7 @@ public class KdTree {
 		if (pset.isEmpty()) {
 			return null;
 		}
-		ArrayList array = new ArrayList<Point2D>();
+		Queue array = new Queue<Point2D>();
 		search(root, array, rect);
 		/*
 		for (Point2D p : pset) {
