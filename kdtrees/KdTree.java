@@ -183,6 +183,44 @@ public class KdTree {
 		}
 	}
 
+	private boolean containP(Node node, Point2D p) {
+		Point2D point = node.getP();
+		if (point.x() == p.x() && point.y() == p.y()) {
+			return true;
+		}
+		/*
+		if (node.lb == null && node.rt == null) {
+			return false;
+		}
+		*/
+		boolean lb = false, rt = false;
+		if (node.isVertical() == true) {
+			if (p.x() < node.x()) {
+				if (node.lb != null) {
+					lb = containP(node.lb, p);
+				}
+			}
+			else {
+				if (node.rt != null) {
+					rt = containP(node.rt, p);
+				}
+			}
+		}
+		else {
+			if (p.y() < node.y()) {
+				if (node.lb != null) {
+					lb = containP(node.lb, p);
+				}
+			}
+			else {
+				if (node.rt != null) {
+					rt = containP(node.rt, p);
+				}
+			}
+		}
+		return lb || rt;
+	}
+
 	public boolean contains(Point2D p) {
 		if (p == null) {
 			throw new IllegalArgumentException();
@@ -190,7 +228,8 @@ public class KdTree {
 		if (root == null) {
 			return false;
 		}
-		Node node = root;
+		return containP(root, p);
+		/*
 		int level = 1;
 		while (node.lb != null || node.rt != null) {
 			if (level % 2 == 1) {
@@ -239,7 +278,7 @@ public class KdTree {
 			}
 			level++;
 		}
-		return false;
+		*/
 	}
 
 	public void draw() {
@@ -294,12 +333,14 @@ public class KdTree {
 		}
 		Point2D minp = null;
 		double min = 10;
+		/*
 		for (Point2D point : pset) {
 			if (p.distanceSquaredTo(point) < min) {
 				min = p.distanceSquaredTo(point);
 				minp = point;
 			}
 		}
+		*/
 		return minp;
 	}
 
