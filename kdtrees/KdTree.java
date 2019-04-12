@@ -247,15 +247,25 @@ public class KdTree {
 		}
 	}
 
-	private xxx search(Node node, RectHV rect) {
+	private void search(Node node, ArrayList<Point2D> array, RectHV rect) {
 		if (!node.getRect().intersects(rect)) {
-			return null;
+			return;
 		}
-		else {
-			if (node.lb != null) {
-				
+		if (node.lb != null) {
+			Node lb = node.lb;
+			if (rect.contains(lb.getP())) {
+				array.add(lb.getP());
 			}
+			search(lb, array, rect);
 		}
+		if (node.rt != null) {
+			Node rt = node.rt;
+			if (rect.contains(rt.getP())) {
+				array.add(rt.getP());
+			}
+			search(rt, array, rect);
+		}
+		return;
 	}
 
 	public Iterable<Point2D> range(RectHV rect) {
@@ -266,13 +276,7 @@ public class KdTree {
 			return null;
 		}
 		ArrayList array = new ArrayList<Point2D>();
-		Node node = root;
-		int level = 1;
-		while (node.lb != null || node.rt != null) {
-			if (node.getRect().intersects(rect)) {
-
-			}
-		}
+		search(root, array, rect);
 		/*
 		for (Point2D p : pset) {
 			if (rect.contains(p)) {
