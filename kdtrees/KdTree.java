@@ -107,90 +107,6 @@ public class KdTree {
 			throw new IllegalArgumentException();
 		}
 		root = insert(root, p, true);
-		/*
-		Node node = new Node(p);
-		pset.add(p);
-		if (isEmpty()) {
-			root = node;
-			node.setRect(0, 0, 1, 1);
-		}
-		size++;
-		Node parent = root;
-		Node child;
-		int level = 1;
-		double xmin, ymin, xmax, ymax;
-		while (true) {
-			if (level % 2 == 1) {
-				if (p.x() < parent.x()) {
-					if (parent.lb != null) {
-						parent = parent.lb;
-					}
-					else {
-						child = new Node(p);
-						parent.setlb(child);
-						xmin = parent.xmin();
-						ymin = parent.ymin();
-						xmax = parent.x();
-						ymax = parent.ymax();
-						child.setRect(xmin, ymin, xmax, ymax);
-						child.setDir(0);
-						return;
-					}
-				}
-				else {
-					if (parent.rt != null) {
-						parent = parent.rt;
-					}
-					else {
-						child = new Node(p);
-						parent.setrt(child);
-						xmin = parent.x();
-						ymin = parent.ymin();
-						xmax = parent.xmax();
-						ymax = parent.ymax();
-						child.setRect(xmin, ymin, xmax, ymax);
-						child.setDir(0);
-						return;
-					}
-				}
-			}
-			else if (level % 2 == 0) {
-				if (p.y() < parent.y()) {
-					if (parent.lb != null) {
-						parent = parent.lb;
-					}
-					else {
-						child = new Node(p);
-						parent.setlb(child);
-						xmin = parent.xmin();
-						ymin = parent.ymin();
-						xmax = parent.xmax();
-						ymax = parent.y();
-						child.setRect(xmin, ymin, xmax, ymax);
-						child.setDir(1);
-						return;
-					}
-				}
-				else {
-					if (parent.rt != null) {
-						parent = parent.rt;
-					}
-					else {
-						child = new Node(p);
-						parent.setrt(child);
-						xmin = parent.xmin();
-						ymin = parent.y();
-						xmax = parent.xmax();
-						ymax = parent.ymax();
-						child.setRect(xmin, ymin, xmax, ymax);
-						child.setDir(1);
-						return;
-					}
-				}
-			}
-			level++;
-		}
-		*/
 	}
 
 	private Node insert(Node node, Point2D p, boolean isVertical) {
@@ -354,33 +270,60 @@ public class KdTree {
 		return array;
 	}
 
-	/*
-	private void nearestP(Node node, Point2D p, double min) {
+	
+	private Point2D nearest(Node node, double x, double y, RectHV rect, Point2D candidate) {
 		if (node == null) {
-			return null;
+			return candidate;
 		}
-		if (p.x() < node.x()) {
-
+		Point2D query = new Point2D(x, y);
+		double dqn = 0.0;
+		double drq = 0.0;
+		Point2D nearest = candidate;
+		if (nearest != null) {
+			dqn = query.distanceSquaredTo(nearest);
+			drq = rect.distanceSquaredTo(query);
 		}
+		if (nearest == null || dqn > drq) {
+			Point2D point = new Point2D(node.x(), node.y());
+			if (node.isVertical()) {
+				RectHV left = new RectHV(rect.xmin(), rect.ymin(), node.x(), rect.ymax());
+				RectHV right = new RectHV(node.x(), rect.ymin(), rect.xmax(), rect.ymax());
+				if (x < node.x()) {
+					nearest = nearest(node.lb, x, y, left, nearest);
+				}
+				else {
+					nearest = nearest(node.rt, x, y, right, nearest);
+				}
+			}
+			else {
+				RectHV left = new RectHV(rect.xmin(), rect.ymin(), rect.xmax(), node.y());
+				RectHV right = new RectHV(rect.xmin(), node.y(), rect.xmax(), rect.ymax());
+				if (y < node.y()) {
+					nearest = nearest(node.lb, x, y, left, nearest);
+				}
+				else {
+					nearest = nearest(node.rt, x, y, right, nearest);
+				}
+			}
+		}
+		return nearest;
 	}
-	*/
 
 	public Point2D nearest(Point2D p) {
 		if (p == null) {
 			throw new IllegalArgumentException();
 		}
-		Point2D minp = null;
-		double min = 10;
-		//minp = nearestP(root, p, min);
-		
+		RectHV rect = new RectHV(0, 0, 1, 1);
+		Point2D nearest = nearest(root, p.x(), p.y(), rect, null);
+		return nearest;
+		/*
 		for (Point2D point : pset) {
 			if (p.distanceSquaredTo(point) < min) {
 				min = p.distanceSquaredTo(point);
 				minp = point;
 			}
 		}
-		
-		return minp;
+		*/
 	}
 
 	public static void main(String[] args) {
