@@ -23,6 +23,13 @@ public class KdTree {
 			rt = null;
 		}
 
+		public Node(Point2D p, Node lb, Node rt, boolean isVertical) {
+			this.p = p;
+			this.lb = lb;
+			this.rt = rt;
+			this.isVertical = isVertical;
+		}
+
 		public double x() {
 			return p.x();
 		}
@@ -99,6 +106,8 @@ public class KdTree {
 		if (p == null) {
 			throw new IllegalArgumentException();
 		}
+		root = insert(root, p, true);
+		/*
 		Node node = new Node(p);
 		pset.add(p);
 		if (isEmpty()) {
@@ -181,6 +190,24 @@ public class KdTree {
 			}
 			level++;
 		}
+		*/
+	}
+
+	private Node insert(Node node, Point2D p, boolean isVertical) {
+		if (node == null) {
+			size++;
+			return new Node(p, null, null, isVertical);
+		}
+		if (node.x() == p.x() && node.y() == p.y()) {
+			return node;
+		}
+		if (p.x() < node.x() && isVertical == true || p.y() < node.y() && isVertical == false) {
+			node.lb = insert(node.lb, p, !isVertical);
+		}
+		else {
+			node.rt = insert(node.rt, p, !isVertical);
+		}
+		return node;
 	}
 
 	private boolean containP(Node node, Point2D p) {
@@ -327,20 +354,32 @@ public class KdTree {
 		return array;
 	}
 
+	/*
+	private void nearestP(Node node, Point2D p, double min) {
+		if (node == null) {
+			return null;
+		}
+		if (p.x() < node.x()) {
+
+		}
+	}
+	*/
+
 	public Point2D nearest(Point2D p) {
 		if (p == null) {
 			throw new IllegalArgumentException();
 		}
 		Point2D minp = null;
 		double min = 10;
-		/*
+		//minp = nearestP(root, p, min);
+		
 		for (Point2D point : pset) {
 			if (p.distanceSquaredTo(point) < min) {
 				min = p.distanceSquaredTo(point);
 				minp = point;
 			}
 		}
-		*/
+		
 		return minp;
 	}
 
