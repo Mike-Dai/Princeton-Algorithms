@@ -66,9 +66,11 @@ public class KdTree {
 			rect = new RectHV(xmin, ymin, xmax, ymax);
 		}
 
+		/*
 		public RectHV getRect() {
 			return rect;
 		}
+		*/
 
 		public Point2D getP() {
 			return p;
@@ -172,56 +174,6 @@ public class KdTree {
 			return false;
 		}
 		return containP(root, p);
-		/*
-		int level = 1;
-		while (node.lb != null || node.rt != null) {
-			if (level % 2 == 1) {
-				double value = Double.compare(p.x(), node.x());
-				if (value < 0) {
-					if (node.lb != null) {
-						node = node.lb;
-					}
-					else {
-						break;
-					}
-				}
-				else if (value == 0 && Double.compare(p.y(), node.y()) == 0) {
-					return true;
-				}
-				else {
-					if (node.rt != null) {
-						node = node.rt;
-					}
-					else {
-						break;
-					}
-				}
-			}
-			else if (level % 2 == 0) {
-				double value = Double.compare(p.y(), node.y());
-				if (value < 0) {
-					if (node.lb != null) {
-						node = node.lb;
-					}
-					else {
-						break;
-					}
-				}
-				else if (value == 0 && Double.compare(p.y(), node.y()) == 0) {
-					return true;
-				}
-				else {
-					if (node.rt != null) {
-						node = node.rt;
-					}
-					else {
-						break;
-					}
-				}
-			}
-			level++;
-		}
-		*/
 	}
 
 	public void draw() {
@@ -230,23 +182,33 @@ public class KdTree {
 		}
 	}
 
-	private void search(Node node, Queue<Point2D> array, RectHV rect) {
-		if (!node.getRect().intersects(rect)) {
+	private void search(Node node, Queue<Point2D> array, RectHV nrect, RectHV rect) {
+		if (!nrect.intersects(rect)) {
 			return;
+		}
+		RectHV left;
+		RectHV right;
+		if (node.isVertical()) {
+			left = new RectHV(rect.xmin(), rect.ymin(), node.x(), rect.ymax());
+			right = new RectHV(node.x(), rect.ymin(), rect.xmax(), rect.ymax());
+		}
+		else {
+			left = new RectHV(rect.xmin(), rect.ymin(), rect.xmax(), node.y());
+			right = new RectHV(rect.xmin(), node.y(), rect.xmax(), rect.ymax());
 		}
 		if (node.lb != null) {
 			Node lb = node.lb;
 			if (rect.contains(lb.getP())) {
 				array.enqueue(lb.getP());
 			}
-			search(lb, array, rect);
+			search(lb, array, left, rect);
 		}
 		if (node.rt != null) {
 			Node rt = node.rt;
 			if (rect.contains(rt.getP())) {
 				array.enqueue(rt.getP());
 			}
-			search(rt, array, rect);
+			search(rt, array, right, rect);
 		}
 		return;
 	}
@@ -255,18 +217,12 @@ public class KdTree {
 		if (rect == null) {
 			throw new IllegalArgumentException();
 		}
-		if (pset.isEmpty()) {
+		if (size == 0) {
 			return null;
 		}
 		Queue array = new Queue<Point2D>();
-		search(root, array, rect);
-		/*
-		for (Point2D p : pset) {
-			if (rect.contains(p)) {
-				array.add(p);
-			}
-		}
-		*/
+		RectHV nrect = new RectHV(0, 0, 1, 1);
+		search(root, array, nrect, rect);
 		return array;
 	}
 
